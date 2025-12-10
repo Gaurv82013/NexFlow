@@ -12,6 +12,7 @@ import  {workspaceSchema, workspaceSchemaType}  from "@/app/schemas/workspaceSch
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from "sonner"
 import { orpc } from "@/lib/orpc"
+import { isDefinedError } from "@orpc/client"
 
 
 export function CreateWorkspace() {
@@ -36,7 +37,16 @@ export function CreateWorkspace() {
                 form.reset();
                 setOpen(false);
             },
-            onError:()=>{
+            onError:(error)=>{
+                if(isDefinedError(error)){
+                    if(error.code==="RATE_LIMITED"){
+                        toast.error(error.message || "You have exceeded the rate limit. Please try again later.");
+                        return;
+                    }
+                    toast.error(error.message || "Failed to create workspace. Please try again!");
+                    return;
+                }
+
                 toast.error("Failed to create workspace. Please try again!");
             }
         })
