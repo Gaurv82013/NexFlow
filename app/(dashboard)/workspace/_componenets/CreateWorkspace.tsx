@@ -1,6 +1,6 @@
 "use client"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip"
 import { useState } from "react"
 import { Button } from "@/components/ui/button" 
 import { Plus } from "lucide-react"
@@ -8,10 +8,16 @@ import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
-import  {workspaceSchema}  from "@/app/schemas/workspaceSchema"
+import  {workspaceSchema, workspaceSchemaType}  from "@/app/schemas/workspaceSchema"
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from "sonner"
+import { orpc } from "@/lib/orpc"
+
 
 export function CreateWorkspace() {
     const [open, setOpen] = useState(false)
+
+    const queryClient = useQueryClient();
 
     const form = useForm({
         resolver:zodResolver(workspaceSchema),
@@ -19,24 +25,44 @@ export function CreateWorkspace() {
             name:"",
         },
     });
+
+    const createWorkspaceMutation = useMutation (
+        orpc.workspace.create.mutationOptions({
+            onSuccess:(newWorkspace)=>{
+                toast.success(`Workspace ${newWorkspace.workspaces[0].workspaceName} created successfully!`);
+
+                queryClient.invalidateQueries({queryKey: orpc.workspace.list.queryKey()});
+
+                form.reset();
+                setOpen(false);
+            },
+            onError:()=>{
+                toast.error("Failed to create workspace. Please try again!");
+            }
+        })
+    )
+
+
      
-    function onSubmit(){
-        console.log("submitted");
+    function onSubmit(value:workspaceSchemaType){
+        createWorkspaceMutation.mutate(value);
     }
     return(
         <Dialog open={open} onOpenChange={setOpen}>
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <DialogTrigger asChild>
-                        <Button size="icon" variant="ghost" className="size-12 rounded-xl text-muted-foreground border-2 border-dashed border-muted-foreground/50 hover:border-muted-foreground hover:rounded-lg hover:text-foreground transition-all duration-200">
-                            <Plus className="size-5"/>
-                        </Button>
-                    </DialogTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                    <p>Create Workspace</p>
-                </TooltipContent>
-            </Tooltip>
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <DialogTrigger asChild>
+                            <Button size="icon" variant="ghost" className="size-12 rounded-xl text-muted-foreground border-2 border-dashed border-muted-foreground/50 hover:border-muted-foreground hover:rounded-lg hover:text-foreground transition-all duration-200">
+                                <Plus className="size-5"/>
+                            </Button>
+                        </DialogTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                        <p>Create Workspace</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Create Workspace</DialogTitle>
@@ -57,7 +83,9 @@ export function CreateWorkspace() {
                                 </FormItem>
 
                             )}/>
-                        <Button type="submit">Create Workspace</Button>
+                        <Button type="submit" disabled={createWorkspaceMutation.isPending}>
+                            {createWorkspaceMutation.isPending ? "Creating..." : "Create Workspace"}
+                        </Button>
                     </form>
                 </Form>
             </DialogContent>
