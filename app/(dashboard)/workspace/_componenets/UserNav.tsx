@@ -9,6 +9,7 @@ import { PortalLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { orpc } from "@/lib/orpc";
 import { gatAvatar } from "@/lib/get-avatar";
+import Image from "next/image";
 
 export function UserNav(){
 
@@ -28,12 +29,12 @@ export function UserNav(){
             <DropdownMenuContent align="end" side="right" sideOffset={12} className="w-56">
                 <DropdownMenuLabel className="font-medium flex items-center gap-2 py-1 px-1.5 text-sm">
                      <Avatar className="size-8 rounded-lg relative ">
-                        <AvatarImage src={gatAvatar(user.picture, user.email!)} alt={user.given_name!} className="object-cover" />
+                        <Image src={gatAvatar(user.picture, user.email!)} alt={user.given_name!} className="object-cover" fill />
                         <AvatarFallback>{user.given_name!.slice(0,2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col text-sm ml-2 leading-tight">
-                        <p className="font-medium truncate">{user.given_name!}</p>
-                        <p className="text-sm text-muted-foreground truncate">{user.email!}</p>
+                        <p className="text-sm font-medium truncate">{user.given_name!}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email!}</p>
                     </div>
 
                 </DropdownMenuLabel>

@@ -2,6 +2,7 @@ import arcjet, { detectBot, shield } from "@/lib/arcjet"
 import { base } from "../base";
 import { KindeUser } from '@kinde-oss/kinde-auth-nextjs';
 
+// Function to build a standard Arcjet instance with predefined rules
 const buildStandardAj=()=>
     arcjet
     .withRule(
@@ -22,7 +23,7 @@ const buildStandardAj=()=>
 
 
 
-
+// Middleware to apply standard security rules using Arcjet
 export const standardSecurityMiddleware=base
     .$context<{
         request:Request;
