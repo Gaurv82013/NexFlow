@@ -1,4 +1,4 @@
-export function gatAvatar(userPicture: string | null, userEmail: string) {
+export function getAvatar(userPicture: string | null, userEmail: string) {
     return userPicture ?? `https://avatar.vercel.sh/${userEmail}`;
 }
 
