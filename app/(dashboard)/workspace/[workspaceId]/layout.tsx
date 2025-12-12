@@ -13,10 +13,11 @@ const channelListLayout = async({children}: {children: React.ReactNode}) => {
     const queryClient=getQueryClient();
     await queryClient.prefetchQuery(orpc.channel.list.queryOptions());
   return (
-    <div className='flex h-full'>
+    <div className='flex flex-col h-full w-full'>
+        <div className='flex h-full'>
         <div className='flex flex-col h-full w-72 border-r border-border bg-secondary'>
             {/* header */}
-            <div className='flex items-center justify-center px-4' style={{borderBottom:"0.1px solid #3B3C3C", height:"50px"}}>
+            <div className='flex items-center justify-center px-4 h-14 border-b border-border'>
                 <HydrateClient client={queryClient}>
                     <WorkspaceHeader />
                 </HydrateClient>
@@ -53,6 +54,10 @@ const channelListLayout = async({children}: {children: React.ReactNode}) => {
                 </Collapsible>
             </div>
            
+        </div>
+        <div className='flex-1 flex flex-col'>
+            {children}
+        </div>
         </div>
     </div>
   )

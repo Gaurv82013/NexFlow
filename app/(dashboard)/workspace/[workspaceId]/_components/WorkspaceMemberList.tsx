@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import { orpc } from "@/lib/orpc";
-import { gatAvatar } from "@/lib/get-avatar";
+import { getAvatar } from "@/lib/get-avatar";
 
 
 
@@ -16,7 +16,7 @@ export function WorkspaceMemberList() {
                 <div key={member.id} className="px-3 flex items-center gap-4 hover:bg-accent cursor-pointer transition-colors duration-200">
                     <div className="relative">
                         <Avatar className="size-8 relative">
-                            <Image src={gatAvatar(member.picture ?? null, member.email!)} alt={member.full_name ?? ""} className="object-cover" fill/>
+                            <Image src={getAvatar(member.picture ?? null, member.email!)} alt={member.full_name ?? ""} className="object-cover" fill/>
                             <AvatarFallback>
                                 {member.full_name?.charAt(0).toUpperCase()}
                             </AvatarFallback>
