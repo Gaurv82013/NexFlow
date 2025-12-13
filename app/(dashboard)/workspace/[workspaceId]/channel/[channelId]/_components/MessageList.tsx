@@ -95,18 +95,18 @@ export function MessageList() {
             }else{
                 setNewMessages(true);
             }
-            lastItemIdRef.current=lastId;
+             lastItemIdRef.current=lastId;
+            } else if (!prevLastId) {
+            lastItemIdRef.current = lastId;
         }
     }, [items]);
 
     const scrollToBottom=()=>{
         const el=scrollRef.current;
         if(!el) return;
-        if(el){
-            el.scrollTop=el.scrollHeight;
-            setNewMessages(false);
-            setIsAtBottom(true);
-        }
+        el.scrollTop=el.scrollHeight;
+        setNewMessages(false);
+        setIsAtBottom(true);
     }
     return(
         <div className="relative h-full">
