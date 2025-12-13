@@ -8,7 +8,7 @@ interface isAppProps{
 }
 export function MessageItem({message}: isAppProps) {
     return(
-        <div className="flex space-x-4 relative p-2 rounded-lg group hover:bg-muted/50 items-center">
+        <div className="flex space-x-4 relative p-2 rounded-lg group hover:bg-muted/50">
             <Image src={getAvatar(message.authorAvatar, message.authorEmail)} alt={message.authorName} width={32} height={32} className="rounded-lg size-8"/>
             <div className="flex-1 space-y-1 min-w-0">
                 <div className="flex items-center gap-x-2">
