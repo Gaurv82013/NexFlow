@@ -22,7 +22,7 @@ export function MessageInputForm({channelId}:iAppProps){
         defaultValues:{
             channelId: channelId,
             content: "",
-            imageUrl: "",
+            
         }
     })
 
@@ -33,7 +33,8 @@ export function MessageInputForm({channelId}:iAppProps){
                 QueryClient.invalidateQueries({
                     queryKey:orpc.message.list.key(),
                 });
-                form.reset({channelId, content:"", imageUrl:""});
+                form.reset({channelId, content:""});
+                    upload.clear();
                 setEditorKey((k)=>k+1);
             },
             onError:(error)=>{
@@ -43,7 +44,10 @@ export function MessageInputForm({channelId}:iAppProps){
     )
 
     function onSubmit(data:createMessageSchemaType){
-        createMessageMutation.mutate(data);
+        createMessageMutation.mutate({
+            ...data,
+            imageUrl: upload.stagedUrl ?? undefined,
+        });
     }
     return (
        <Form {...form}>
