@@ -12,7 +12,7 @@ interface ImageUploadModelProps {
 }
 
 export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadModelProps) {
-    const toastIdRef = useRef<string | number | undefined>();
+    const toastIdRef = useRef<string | number | null>(null);
 
     return(
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -29,7 +29,7 @@ export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadMo
                         endpoint={"imageUploader"}
                         onClientUploadComplete={(res)=>{
                             const url = res?.[0]?.url || res?.[0]?.ufsUrl;
-                            if(toastIdRef.current) {
+                            if (toastIdRef.current) {
                                 toast.dismiss(toastIdRef.current);
                             }
                             toast.success("Image uploaded successfully");
@@ -38,7 +38,7 @@ export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadMo
                         }}
                         onUploadError={(error: Error)=>{
                             console.error("Upload error:", error);
-                            if(toastIdRef.current) {
+                            if (toastIdRef.current) {
                                 toast.dismiss(toastIdRef.current);
                             }
                             toast.error(`Upload failed: ${error?.message || "Unknown error"}`);
