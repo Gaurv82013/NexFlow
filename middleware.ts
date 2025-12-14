@@ -58,6 +58,8 @@ const combinedMiddleware: NextMiddleware = async (req, event) => {
         }
     }catch(e){
         console.warn("middleware bypass check failed", e);
+        // Fail open: bypass auth if we can't determine the route
+        return NextResponse.next();
     }
     return authWrapped(req, event);
 };
