@@ -34,9 +34,6 @@ export function MessageInputForm({channelId}:iAppProps){
                     queryKey:orpc.message.list.key(),
                 });
                 form.reset({channelId, content:"", imageUrl:""});
-                if (upload.setStagedUrl) {
-                    upload.setStagedUrl(null);
-                }
                 setEditorKey((k)=>k+1);
             },
             onError:(error)=>{

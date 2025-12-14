@@ -37,19 +37,36 @@ async function existingMiddleware(req:NextRequest){
 }
 
 
-export default createMiddleware(aj,withAuth(existingMiddleware,{
+const authWrapped = withAuth(existingMiddleware,{
     publicRoutes:[
         "/",
         "/about",
         "/pricing",
         "/contact",
-        "/api/uploadthing",
-        "/api/uploadthing/:path*"
+        "/api/uploadthing(.*)",
     ]
-}) as NextMiddleware
-);
+}) as NextMiddleware;
+
+const combinedMiddleware: NextMiddleware = async (req, event) => {
+    try{
+        const p = req.nextUrl.pathname;
+        if(p.startsWith("/api/uploadthing")){
+            // Bypass auth/arcjet middleware for uploadthing API so uploads aren't blocked
+            // (keep a tiny log for debugging)
+            console.log("Bypassing global middleware for upload request:", p);
+            return NextResponse.next();
+        }
+    }catch(e){
+        console.warn("middleware bypass check failed", e);
+    }
+    return authWrapped(req, event);
+};
+
+export default createMiddleware(aj, combinedMiddleware) as NextMiddleware;
 
 
 export const config={
-    matcher:["/((?!_next/static|_next/image|favicon.ico|/rpc).*)"]
+    // Exclude Uploadthing API from middleware so upload requests are not intercepted
+    // by the auth middleware and can complete properly.
+    matcher:["/((?!_next/static|_next/image|favicon.ico|/rpc|/api/uploadthing).*)"]
 }

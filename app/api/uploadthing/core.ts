@@ -11,7 +11,7 @@ export const ourFileRouter = {
   imageUploader: f({
     image: {
       
-      maxFileSize: "4MB",
+      maxFileSize: "1MB",
       maxFileCount: 1,
     },
   })
@@ -34,7 +34,7 @@ export const ourFileRouter = {
       console.log("file url", file.ufsUrl);
 
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-      return { uploadedBy: metadata.userId, ufsUrl: file.ufsUrl };
+      return { uploadedBy: metadata.userId};
     }),
 } satisfies FileRouter;
 
