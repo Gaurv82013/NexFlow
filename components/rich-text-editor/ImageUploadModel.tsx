@@ -33,6 +33,7 @@ export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadMo
                             }
                             toast.success("Image uploaded successfully");
                             onUploaded(url);
+                            onOpenChange(false);
                         }}
                         onUploadError={(error: Error)=>{
                             toast.error(`Upload failed: ${error?.message || "Unknown error"}`);
