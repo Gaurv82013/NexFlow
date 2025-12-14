@@ -26,7 +26,11 @@ export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadMo
                         }}
                         endpoint={"imageUploader"}
                         onClientUploadComplete={(res)=>{
-                            const url = res[0].ufsUrl;
+                            const url = res?.[0]?.ufsUrl;
+                            if (!url) {
+                                toast.error("Upload failed: No image URL returned.");
+                                return;
+                            }
                             toast.success("Image uploaded successfully");
                             onUploaded(url);
                         }}
