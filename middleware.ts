@@ -43,7 +43,6 @@ const authWrapped = withAuth(existingMiddleware,{
         "/about",
         "/pricing",
         "/contact",
-        "/api/uploadthing(.*)",
     ]
 }) as NextMiddleware;
 
