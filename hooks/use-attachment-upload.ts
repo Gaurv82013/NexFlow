@@ -1,6 +1,5 @@
 "use client"
 
-import { on } from "events";
 import { useCallback, useMemo, useState } from "react";
 
 export function useAttachmentUpload() {
