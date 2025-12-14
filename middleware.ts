@@ -30,7 +30,7 @@ async function existingMiddleware(req:NextRequest){
     const orgCode =anyReq.kindeAuth?.user?.org_code || anyReq.kindeAuth?.token?.org_code || anyReq.kindeAuth?.token?.claims?.org_code;
 
     if(url.pathname.startsWith('/workspace') && !url.pathname.includes(orgCode || "")){
-        url.pathname=`/workspace/ ${orgCode}`;
+        url.pathname=`/workspace/${orgCode}`;
         return NextResponse.redirect(url);
     }
     return NextResponse.next();
