@@ -5,7 +5,7 @@ import { UploadDropzone } from "@/lib/uploadthing";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { toast } from "sonner";
 
-interface ImageUploadModelProps {
+interface ImageUploadModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onUploaded: (url: string) => void;
