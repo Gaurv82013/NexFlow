@@ -3,7 +3,6 @@ import { ImageUploadModel } from "@/components/rich-text-editor/ImageUploadModel
 import { Button } from "@/components/ui/button";
 import { useAttachmentUploadType } from "@/hooks/use-attachment-upload";
 import { ImageIcon, Send } from "lucide-react";
-import { on } from 'events';
 
 interface iAppProps{
     value: string;
