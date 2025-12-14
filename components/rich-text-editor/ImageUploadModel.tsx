@@ -23,6 +23,8 @@ export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadMo
                             container:"bg-card",
                             label:"text-muted-foreground",
                             allowedContent:"text-xs text-muted-foreground",
+                            button: "ut-uploading:opacity-50",
+                            uploadIcon: "ut-upload-icon size-6 text-muted-foreground",
                         }}
                         endpoint={"imageUploader"}
                         onClientUploadComplete={(res)=>{

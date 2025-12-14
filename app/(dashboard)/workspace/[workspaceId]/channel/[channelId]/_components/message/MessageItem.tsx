@@ -29,6 +29,11 @@ export function MessageItem({message}: isAppProps) {
                 </div>
                 <div>
                     <SafeContent className="text-sm break-words prose dark:prose-invert max-w-none mark:text-primary" content={JSON.parse(message.content)} />
+                    {message.imageUrl && (
+                        <div className="mt-3">
+                            <Image src={message.imageUrl} alt="Message Attachment" width={512} height={384} className="rounded-md object-cover max-h-60"/>
+                        </div>
+                    )}
                 </div>
 
             </div>

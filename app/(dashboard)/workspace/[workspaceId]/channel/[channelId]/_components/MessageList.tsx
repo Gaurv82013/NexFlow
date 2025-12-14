@@ -110,7 +110,7 @@ export function MessageList() {
     }
     return(
         <div className="relative h-full">
-            <div className="h-full overflow-y-auto px-4" ref={scrollRef} onScroll={handleScroll}>
+            <div className="h-full overflow-y-auto px-4 flex flex-col space-y-1" ref={scrollRef} onScroll={handleScroll}>
                 {items.map((message)=>(
                     <MessageItem key={message.id} message={message} />
                 )
