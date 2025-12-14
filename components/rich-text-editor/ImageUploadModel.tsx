@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef } from "react";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { toast } from "sonner";
@@ -10,7 +11,9 @@ interface ImageUploadModalProps {
     onUploaded: (url: string) => void;
 }
 
-export function ImageUploadModal({open, onOpenChange, onUploaded}: ImageUploadModalProps) {
+export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadModelProps) {
+    const toastIdRef = useRef<string | number | null>(null);
+
     return(
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
@@ -26,16 +29,24 @@ export function ImageUploadModal({open, onOpenChange, onUploaded}: ImageUploadMo
                         endpoint={"imageUploader"}
                         onClientUploadComplete={(res)=>{
                             const url = res?.[0]?.url || res?.[0]?.ufsUrl;
+                            if (toastIdRef.current) {
+                                toast.dismiss(toastIdRef.current);
+                                toastIdRef.current = null;
+                            }
                             toast.success("Image uploaded successfully");
                             if(url) onUploaded(url);
                             onOpenChange(false);
                         }}
                         onUploadError={(error: Error)=>{
                             console.error("Upload error:", error);
+                            if (toastIdRef.current) {
+                                toast.dismiss(toastIdRef.current);
+                                toastIdRef.current = null;
+                            }
                             toast.error(`Upload failed: ${error?.message || "Unknown error"}`);
                         }}
                         onUploadBegin={(fileName)=>{
-                            toast.loading(`Uploading ${fileName}...`);
+                            toastIdRef.current = toast.loading(`Uploading ${fileName}...`);
                         }}/>
                 
             </DialogContent>
