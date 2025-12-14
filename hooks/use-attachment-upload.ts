@@ -20,7 +20,7 @@ export function useAttachmentUpload() {
         onUploaded,
         stagedUrl,
         isUploading,
-    }), [isOpen, setIsOpen, onUploaded, stagedUrl, isUploading,]);
+    }), [isOpen, onUploaded, stagedUrl, isUploading]);
 }
 
 export type useAttachmentUploadType = ReturnType<typeof useAttachmentUpload>;
