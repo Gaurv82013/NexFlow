@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef } from "react";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { toast } from "sonner";
@@ -11,6 +12,8 @@ interface ImageUploadModelProps {
 }
 
 export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadModelProps) {
+    const toastIdRef = useRef<string | number | undefined>();
+
     return(
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent>
@@ -26,16 +29,22 @@ export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadMo
                         endpoint={"imageUploader"}
                         onClientUploadComplete={(res)=>{
                             const url = res?.[0]?.url || res?.[0]?.ufsUrl;
+                            if(toastIdRef.current) {
+                                toast.dismiss(toastIdRef.current);
+                            }
                             toast.success("Image uploaded successfully");
                             if(url) onUploaded(url);
                             onOpenChange(false);
                         }}
                         onUploadError={(error: Error)=>{
                             console.error("Upload error:", error);
+                            if(toastIdRef.current) {
+                                toast.dismiss(toastIdRef.current);
+                            }
                             toast.error(`Upload failed: ${error?.message || "Unknown error"}`);
                         }}
                         onUploadBegin={(fileName)=>{
-                            toast.loading(`Uploading ${fileName}...`);
+                            toastIdRef.current = toast.loading(`Uploading ${fileName}...`);
                         }}/>
                 
             </DialogContent>
