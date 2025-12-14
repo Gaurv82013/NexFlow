@@ -31,6 +31,7 @@ export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadMo
                             const url = res?.[0]?.url || res?.[0]?.ufsUrl;
                             if (toastIdRef.current) {
                                 toast.dismiss(toastIdRef.current);
+                                toastIdRef.current = null;
                             }
                             toast.success("Image uploaded successfully");
                             if(url) onUploaded(url);
@@ -40,6 +41,7 @@ export function ImageUploadModel({open, onOpenChange, onUploaded}: ImageUploadMo
                             console.error("Upload error:", error);
                             if (toastIdRef.current) {
                                 toast.dismiss(toastIdRef.current);
+                                toastIdRef.current = null;
                             }
                             toast.error(`Upload failed: ${error?.message || "Unknown error"}`);
                         }}
