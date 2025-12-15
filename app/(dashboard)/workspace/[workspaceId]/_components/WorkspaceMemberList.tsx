@@ -13,7 +13,7 @@ export function WorkspaceMemberList() {
     return(
         <div className="space-y-0.5 py-1">
             {members.map((member)=>(
-                <div key={member.id} className="px-3 flex items-center gap-4 hover:bg-accent cursor-pointer transition-colors duration-200">
+                <div key={member.id} className="px-3 flex items-center gap-4 hover:bg-accent cursor-pointer transition-colors duration-200 py-2">
                     <div className="relative">
                         <Avatar className="size-8 relative">
                             <Image src={getAvatar(member.picture ?? null, member.email!)} alt={member.full_name ?? ""} className="object-cover" fill/>
