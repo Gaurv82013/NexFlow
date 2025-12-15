@@ -11,6 +11,7 @@ interface iAppProps{
     onSubmit:()=>void;
     isSubmitting?:boolean;
     upload:useAttachmentUploadType;
+    disabled?: boolean;
 }
 export function MessageComposer({value, onChange, onSubmit, isSubmitting, upload}: iAppProps){
     return(
@@ -26,7 +27,7 @@ export function MessageComposer({value, onChange, onSubmit, isSubmitting, upload
                 upload.stagedUrl ? (
                     <AttachmentChip url={upload.stagedUrl} onRemove={upload.clear} />
                 ):(
-                    <Button variant="outline" size="sm" type="button" onClick={()=>upload.setIsOpen(true)}>
+                    <Button variant="outline" size="sm" type="button" onClick={()=>upload.setIsOpen(true)} className="hover:cursor-pointer">
                         <ImageIcon className="size-4 ml-1"/>
                         Attach
                     </Button>

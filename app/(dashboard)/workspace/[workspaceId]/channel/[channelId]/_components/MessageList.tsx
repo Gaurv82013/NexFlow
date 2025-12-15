@@ -5,6 +5,8 @@ import { orpc } from "@/lib/orpc"
 import { useParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/general/EmptyState";
+import { CircleArrowDown, Loader } from "lucide-react";
 
 
 export function MessageList() { 
@@ -13,14 +15,14 @@ export function MessageList() {
     const scrollRef=useRef<HTMLDivElement | null>(null);
     const bottomRef=useRef<HTMLDivElement | null>(null);
     const [isAtBottom, setIsAtBottom]=useState(false);
-    const [newMessages, setNewMessages]=useState(false);
     const lastItemIdRef=useRef<string | undefined>(undefined);
     const infiniteOptions=orpc.message.list.infiniteOptions({
         input:(pageParams:string | undefined)=>({
             channelId:channelId,
             cursor:pageParams,
-            limit:30,
+            limit:10,
         }),
+        queryKey:['message.list', channelId],
         initialPageParam: undefined,
         getNextPageParam:(lastPage)=> lastPage.nextCursor,
         select:(data)=>({
@@ -34,23 +36,65 @@ export function MessageList() {
         fetchNextPage,
         hasNextPage,
         isFetching,
+        isFetchingNextPage,
+        isLoading,
+        isError,
     } =useInfiniteQuery({
         ...infiniteOptions,
         staleTime: 30_000,
         refetchOnWindowFocus: false,
     });
 
+    // Scroll to bottom when messages load initially
     useEffect(()=>{
         if(!hasInitialScrolled && data?.pages.length){
             const el=scrollRef.current;
             if(el){
-                el.scrollTop=el.scrollHeight;
+                bottomRef.current?.scrollIntoView({block:"end"});
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setHasInitialScrolled(true);
                 setIsAtBottom(true);
             }
         }
     }, [hasInitialScrolled, data?.pages.length]);
+
+    //keep view pinned to bottom on late content growth (e.g., images loading)
+    useEffect(()=>{
+        const el=scrollRef.current;
+        if(!el) return;
+        const scrollToBottomIfNeeded=()=>{
+            if(isAtBottom || !hasInitialScrolled){
+                requestAnimationFrame(()=>{
+                    bottomRef.current?.scrollIntoView({block:"end"});
+                })
+            }
+        };
+        const onImageLoad=(e: Event)=>{
+            if(e.target instanceof HTMLImageElement){
+                scrollToBottomIfNeeded();
+            }
+        }
+
+        el.addEventListener("load", onImageLoad, true);
+
+        // ResizeObserver watches for size changes in the scroll container
+        const resizeObserver=new ResizeObserver(()=>{
+            scrollToBottomIfNeeded();
+        });
+        resizeObserver.observe(el);
+
+        // MutationObserver watches for DOM changes in the scroll container
+        const mutationObserver=new MutationObserver(()=>{
+            scrollToBottomIfNeeded();
+        });
+
+        mutationObserver.observe(el, {childList:true, subtree:true, characterData:true, attributes:true});
+        return ()=>{
+            el.removeEventListener("load", onImageLoad, true);
+            resizeObserver.disconnect();
+            mutationObserver.disconnect();
+        }
+    },[isAtBottom, hasInitialScrolled]);
 
     const isNearBottom=(el: HTMLDivElement) => 
         el.scrollHeight - el.scrollTop - el.clientHeight <= 80;
@@ -76,6 +120,8 @@ export function MessageList() {
         return data?.pages.flatMap(page=>page.items) || [];
     }, [data]);
 
+    const isEmpty = !isLoading && items.length === 0 && !isError;
+
     useEffect(()=>{
         if(!items.length){
             return;
@@ -90,10 +136,7 @@ export function MessageList() {
                     el.scrollTop=el.scrollHeight;
                 });
                 // eslint-disable-next-line react-hooks/set-state-in-effect
-                setNewMessages(false);
                 setIsAtBottom(true);
-            }else{
-                setNewMessages(true);
             }
              lastItemIdRef.current=lastId;
             } else if (!prevLastId) {
@@ -104,25 +147,35 @@ export function MessageList() {
     const scrollToBottom=()=>{
         const el=scrollRef.current;
         if(!el) return;
-        el.scrollTop=el.scrollHeight;
-        setNewMessages(false);
+        bottomRef.current?.scrollIntoView({block:"end"});
         setIsAtBottom(true);
     }
     return(
         <div className="relative h-full">
             <div className="h-full overflow-y-auto px-4 flex flex-col space-y-1" ref={scrollRef} onScroll={handleScroll}>
-                {items.map((message)=>(
+                {isEmpty ? (
+                    <EmptyState title="No messages" description="There are no messages in this channel." href="#" buttonText="Send a message" />
+                ) : (
+                    items.map((message)=>(
                     <MessageItem key={message.id} message={message} />
+                )
                 )
                 )}
                 <div ref={bottomRef}></div>
             </div>
-            {newMessages && !isAtBottom ? (
-                <Button className="absolute bottom-4 right-8 rounded-full" type="button" onClick={scrollToBottom}>
-                    New Messages
+            {isFetchingNextPage && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center gap-x-2 bg-background/80 px-4 py-2 rounded-md">
+                    <Loader className="size-4 animate-spin text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground bg-background/80 px-2 py-1 rounded-md">Loading more messages...</span>
+                </div>
+            )}
+            {!isAtBottom && (
+                <Button onClick={scrollToBottom} className="absolute bottom-4 right-5 -translate-x-1/2 bg-primary/90 hover:bg-primary/100 text-white shadow-lg hover:shadow-xl hover:cursor-pointer" type="button" size="sm">
+                    <CircleArrowDown size={16} />
                 </Button>
-            ) : null} 
+            )}
 
         </div>
     )
 }
+

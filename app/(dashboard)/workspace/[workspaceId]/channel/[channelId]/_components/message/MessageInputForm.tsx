@@ -2,18 +2,29 @@
 import { createMessageSchema, createMessageSchemaType } from "@/app/schemas/message";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import {  useForm } from "react-hook-form";
 import { MessageComposer } from "./MessageComposer";
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from "sonner";
 import { orpc } from "@/lib/orpc";
 import { useState } from "react";
 import { useAttachmentUpload } from "@/hooks/use-attachment-upload";
+import { Message } from "@/lib/generated/prisma/client";
+import { KindeUser } from "@kinde-oss/kinde-auth-nextjs";
+import { getAvatar } from "@/lib/get-avatar";
 
 interface iAppProps{
-channelId:string;
+    channelId:string;
+    user?:KindeUser<Record<string, unknown>>;
 }
-export function MessageInputForm({channelId}:iAppProps){
+
+type MessageProps = {
+    items:Message[];
+    nextCursor?:string;
+}
+type InfiniteMessages= InfiniteData<MessageProps>;
+
+export function MessageInputForm({channelId, user}:iAppProps){
     const [editorKey, setEditorKey]=useState(0);
     const upload=useAttachmentUpload();
     const QueryClient=useQueryClient();
@@ -28,17 +39,93 @@ export function MessageInputForm({channelId}:iAppProps){
 
     const createMessageMutation=useMutation(
         orpc.message.create.mutationOptions({
-            onSuccess:()=>{
-                toast.success("Message sent successfully");
-                QueryClient.invalidateQueries({
-                    queryKey:orpc.message.list.key(),
+            onMutate:async(data)=>{
+                await QueryClient.cancelQueries({
+                    queryKey:["message.list", channelId],
                 });
-                form.reset({channelId, content:""});
-                    upload.clear();
-                setEditorKey((k)=>k+1);
+                const previousData=QueryClient.getQueryData<InfiniteMessages>(
+                    ["message.list", channelId],
+                );
+
+                const tempId=`optimistic-${crypto.randomUUID()}`;
+                const optimisticMessage:Message={
+                    id: tempId,
+                    content: data.content,
+                    channelId: channelId,
+                    imageUrl: data.imageUrl ?? null,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    authorId: user?.id ?? "",
+                    authorAvatar:getAvatar(user?.picture ?? null, user?.email ?? ""),
+                    authorName:user?.given_name || "Unknown User",
+                    authorEmail:user?.email ?? "",
+                };
+                QueryClient.setQueryData<InfiniteMessages>(
+                    ["message.list", channelId],
+                    (old)=>{
+                        if(!old){
+                            return {
+                                pages:[
+                                    {
+                                        items:[optimisticMessage],
+                                        nextCursor:undefined,
+                                    }
+                                ],
+                                pageParams:[undefined],
+                            } satisfies InfiniteMessages;
+                        }
+                        
+                        const firstPage=old.pages[0] ?? {
+                            items:[],
+                            nextCursor:undefined,
+                        }
+                        const updatedFirstPage={
+                            ...firstPage,
+                            items:[optimisticMessage, ...firstPage.items],
+                        };
+                        return {
+                            ...old,
+                            pages:[updatedFirstPage, ...old.pages.slice(1)],
+                        };
+                    }
+                );
+                return{
+                    previousData,
+                    tempId,
+                }
             },
-            onError:(error)=>{
-                toast.error(`Failed to send message: ${error.message}`);
+            onSuccess:(data, _variables, context)=>{
+                QueryClient.setQueryData<InfiniteMessages>(
+                    ["message.list", channelId],
+                    (old)=>{
+                        if(!old) return old;
+                        const updatedPages=old.pages.map((page)=>({
+                            ...page,
+                            items: page.items.map((msg)=> msg.id === context.tempId ? {
+                                ...data,
+                            }: msg),
+                        }));
+                        return {
+                            ...old,
+                            pages: updatedPages,
+                        };
+                    }
+                );
+                form.reset({channelId, content:""});
+                
+                upload.clear();
+                setEditorKey((prev)=> prev + 1);
+                toast.success("Message sent successfully");
+                
+            },
+            onError:(_err, _variables , context)=>{
+                if(context?.previousData){
+                    QueryClient.setQueryData(
+                        ["message.list", channelId],
+                        context.previousData
+                    );
+                }
+                toast.error(`Failed to send message ${_err instanceof Error ? _err.message : ""}`);
             }
         })
     )
