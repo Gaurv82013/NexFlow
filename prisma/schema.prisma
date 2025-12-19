@@ -36,4 +36,10 @@ model Message {
 
   channelId String? // References channel(id)
   channel channel? @relation(fields: [channelId], references: [id])   // Many-to-one relationship with channel model
+
+  // Threaded messages
+  parentMessage Message? @relation("MessageThread", fields: [threadId], references: [id] , onDelete: Cascade)
+  threadId String?
+  replies Message[] @relation("MessageThread") // One-to-many relationship for threaded messages
+  
 }
