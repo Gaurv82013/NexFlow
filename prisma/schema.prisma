@@ -42,4 +42,24 @@ model Message {
   threadId String?
   replies Message[] @relation("MessageThread") // One-to-many relationship for threaded messages
   
+  MessageReactions MessageReaction[] // One-to-many relationship with MessageReaction model
+}
+
+model MessageReaction {
+  id String @id @default(uuid())
+  emoji String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //user data
+  userId String
+  userEmail String
+  userName String
+  userAvatar String
+
+  //foreign key
+  messageId String // References Message(id)
+  Message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
 }

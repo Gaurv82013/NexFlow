@@ -9,6 +9,7 @@ import { MessagesSquare } from "lucide-react";
 import { useThread } from "@/providers/ThreadProvider";
 import { orpc } from "@/lib/orpc";
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { ReactionsBar } from "../reaction/ReactionsBar";
 
 
 interface isAppProps{
@@ -60,6 +61,9 @@ export function MessageItem({message, currentUserId}: isAppProps) {
                                 <Image src={message.imageUrl} alt="Message Attachment" width={512} height={384} className="rounded-md object-cover max-h-60"/>
                             </div>
                         )}
+
+                        {/* reactions */}
+                        <ReactionsBar messageId={message.id} reactions={message.reactions} context={{type: 'list', channelId: message.channelId!}} />
                         {message.repliesCount > 0 && (
                             <button type="button" className="flex  items-center gap-x-1 mt-2 text-xs text-muted-foreground hover:text-primary transition-colors hover:cursor-pointer" onClick={() => openThread(message.id)} onMouseEnter={prefetchThread} onFocus={prefetchThread} >
                                 <MessagesSquare className="size-3" />
