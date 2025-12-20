@@ -1,13 +1,15 @@
 import { SafeContent } from "@/components/rich-text-editor/SafeContent";
-import { Message } from "@/lib/generated/prisma/client";
 import Image from "next/image";
+import { ReactionsBar } from "../reaction/ReactionsBar";
+import { MessageListItem } from "@/lib/types";
 
 interface ThreadReplyProps{
-    message:Message;
+    message:MessageListItem;
+    selectedThreadId?:string;
 }
 
 
-export function ThreadReply({message}:ThreadReplyProps){
+export function ThreadReply({message, selectedThreadId}:ThreadReplyProps){
     return(
         <div className="flex space-x-3 p-3 hover:bg-muted/30 rounded-lg">
             <Image src={message.authorAvatar} alt={message.authorName} width={32} height={32} className="rounded-full shrink-0 size-8 "/>
@@ -32,6 +34,7 @@ export function ThreadReply({message}:ThreadReplyProps){
 
                                 </div>
                                 )}
+                                <ReactionsBar messageId={message.id} reactions={message.reactions} context={{type: 'thread', threadId:selectedThreadId!}} />
 
                             </div>
                         </div>
