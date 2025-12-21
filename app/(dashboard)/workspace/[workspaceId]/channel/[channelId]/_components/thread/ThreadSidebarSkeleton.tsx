@@ -9,6 +9,7 @@ export function ThreadSidebarSkeleton() {
                     <Skeleton className="h-8 w-20"/>    
                 </div>
                 <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-25"/>
                     <Skeleton className="size-8"/>
                 </div>
             </div>

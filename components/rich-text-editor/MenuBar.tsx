@@ -4,6 +4,8 @@ import { Toggle } from "../ui/toggle";
 import {Bold, Italic, Strikethrough, Code, ListIcon, ListOrdered, Undo, Redo} from "lucide-react"
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
+import { ComposeAssistent } from "./ComposeAssisten";
+import { markdownToJson } from "@/lib/markdown-to-json";
 
 interface MenuBarProps {
     editor:Editor | null;
@@ -24,11 +26,21 @@ export function MenuBar({editor}:MenuBarProps) {
                 isOrderedList: editor.isActive("orderedList"),
                 canUndo: editor.can().undo(),
                 canRedo: editor.can().redo(),
+                currentContent: editor.getJSON(),
             }
         }
     })
     if (!editor) {
         return null;
+    }
+
+    const handleAcceptCompose=(markdown: string)=>{
+        try{
+            const json = markdownToJson(markdown);
+            editor.commands.setContent(json);
+        }catch{
+            console.error("Failed to convert markdown to JSON");
+        }
     }
 
     return(
@@ -155,6 +167,10 @@ export function MenuBar({editor}:MenuBarProps) {
                             <p className="text-xs">Redo</p>
                         </TooltipContent>
                     </Tooltip>
+                </div>
+                <div className="w-px h-8 bg-border mx-2"></div>
+                <div className="flex-wrap flex gap-1">
+                    <ComposeAssistent content={JSON.stringify(editorState?.currentContent)} onAccept={handleAcceptCompose} />
                 </div>
             </TooltipProvider>
         </div>
