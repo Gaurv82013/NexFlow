@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { MessageListItem } from '@/lib/types';
 import { useChannelRealtime } from '@/providers/ChannelRealtimeProvider';
+import { useOptionalThreadRealtime } from '@/providers/ThreadRealtimeProvider';
+
 
 type ThreadContext={type: 'thread', threadId: string};
 type ListContext={type: 'list', channelId: string};
@@ -30,6 +32,7 @@ export function ReactionsBar({ messageId, reactions = [], context }: ReactionsBa
     const { channelId }=useParams<{channelId:string}>();
     const queryClient=useQueryClient();
     const { send }=useChannelRealtime();
+    const   threadRealtime = useOptionalThreadRealtime();
     const toggleMutation = useMutation(
         orpc.message.reaction.toggle.mutationOptions({
             onMutate: async(vars: { emoji: string; messageId: string })=>{
@@ -100,6 +103,16 @@ export function ReactionsBar({ messageId, reactions = [], context }: ReactionsBa
                     type:"reaction:updated",
                     payload:data,
                 });
+                if(context && context.type==='thread' && threadRealtime){
+                    const threadId = context.threadId;
+                    threadRealtime.send({
+                        type: "thread:reply:updated",
+                        payload: {
+                            ...data,
+                            threadId: threadId,
+                            }
+                });
+                }
               return  toast.success("Emoji added successfully");
               
             },
