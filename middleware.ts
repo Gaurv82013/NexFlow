@@ -49,6 +49,11 @@ const authWrapped = withAuth(existingMiddleware,{
 const combinedMiddleware: NextMiddleware = async (req, event) => {
     try{
         const p = req.nextUrl.pathname;
+        // Ensure homepage is explicitly allowed as public (avoid unintended redirect)
+        if (p === "/" || p === "") {
+            console.log("Allowing public homepage through middleware:", p);
+            return NextResponse.next();
+        }
         if(p.startsWith("/api/uploadthing")){
             // Bypass auth/arcjet middleware for uploadthing API so uploads aren't blocked
             // (keep a tiny log for debugging)
