@@ -12,6 +12,7 @@ import { useAttachmentUpload } from "@/hooks/use-attachment-upload";
 import { Message } from "@/lib/generated/prisma/client";
 import { KindeUser } from "@kinde-oss/kinde-auth-nextjs";
 import { getAvatar } from "@/lib/get-avatar";
+import { useChannelRealtime } from "@/providers/ChannelRealtimeProvider";
 
 interface iAppProps{
     channelId:string;
@@ -28,6 +29,7 @@ export function MessageInputForm({channelId, user}:iAppProps){
     const [editorKey, setEditorKey]=useState(0);
     const upload=useAttachmentUpload();
     const QueryClient=useQueryClient();
+    const {send}=useChannelRealtime();
     const form=useForm({
         resolver:zodResolver(createMessageSchema),
         defaultValues:{
@@ -117,7 +119,12 @@ export function MessageInputForm({channelId, user}:iAppProps){
                 upload.clear();
                 setEditorKey((prev)=> prev + 1);
                 toast.success("Message sent successfully");
-                
+                send({
+                    type:"message:created",
+                    payload:{
+                        message:data,
+                    }
+                })
             },
             onError:(_err, _variables , context)=>{
                 if(context?.previousData){

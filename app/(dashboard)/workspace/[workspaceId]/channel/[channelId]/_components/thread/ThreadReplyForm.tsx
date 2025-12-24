@@ -6,14 +6,13 @@ import { useForm } from "react-hook-form"
 import { MessageComposer } from "../message/MessageComposer";
 import { useAttachmentUpload } from "@/hooks/use-attachment-upload";
 import { useEffect, useState } from "react";
-import { useMutation, QueryClient, useQueryClient, InfiniteData } from '@tanstack/react-query';
+import { useMutation, useQueryClient, InfiniteData } from '@tanstack/react-query';
 import { orpc } from "@/lib/orpc";
 import { toast } from "sonner";
-import { ThreadReply } from './ThreadReply';
-import { Message } from "@/lib/generated/prisma/client";
 import { KindeUser } from "@kinde-oss/kinde-auth-nextjs";
 import { getAvatar } from "@/lib/get-avatar";
 import { MessageListItem } from "@/lib/types";
+import { useChannelRealtime } from "@/providers/ChannelRealtimeProvider";
 
 interface ThreadReplyFormProps{
     threadId:string;
@@ -25,6 +24,7 @@ export function ThreadReplyForm({threadId, user}: ThreadReplyFormProps){
     const upload=useAttachmentUpload();
     const [editorKey, setEditorKey]=useState(0);
     const queryClient=useQueryClient();
+    const {send}=useChannelRealtime();
     const form=useForm({
         defaultValues:{
             content:"",
@@ -56,7 +56,7 @@ export function ThreadReplyForm({threadId, user}: ThreadReplyFormProps){
 
                 await queryClient.cancelQueries({ queryKey: listOptions.queryKey });
                 const previous= queryClient.getQueryData(listOptions.queryKey);
-                const optimistic:Message={
+                const optimistic: MessageListItem ={
                     id:`optimistic:${crypto.randomUUID()}`,
                     content: data.content,
                     createdAt: new Date(),
@@ -68,6 +68,8 @@ export function ThreadReplyForm({threadId, user}: ThreadReplyFormProps){
                     channelId: data.channelId,
                     threadId: data.threadId!,
                     imageUrl: data.imageUrl ?? null,
+                    repliesCount: 0,
+                    reactions: [],
                 };
                 queryClient.setQueryData(listOptions.queryKey, (old)=>{
                     if(!old){
@@ -108,10 +110,18 @@ export function ThreadReplyForm({threadId, user}: ThreadReplyFormProps){
             },
             onSuccess:(_data,_vars,ctx)=>{
                 queryClient.invalidateQueries({queryKey:ctx.listOptions.queryKey});
-                toast.success("Reply sent successfully");
+                
                 form.reset({content:"", channelId, threadId});
                 upload.clear();
                 setEditorKey((prev)=>prev+1);
+                send({
+                    type: "message:replies:increment",
+                    payload: {
+                        messageId: threadId,
+                        delta: 1,
+                    },
+                });
+                toast.success("Reply sent successfully");
             },
             onError:(_err,_vars,ctx)=>{
                 if(!ctx) return;
