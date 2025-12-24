@@ -5,7 +5,7 @@ var __export = (target, all) => {
     __defProp(target, name, { get: all[name], enumerable: true });
 };
 
-// .wrangler/tmp/bundle-bYau65/checked-fetch.js
+// .wrangler/tmp/bundle-Oif9tQ/checked-fetch.js
 var urls = /* @__PURE__ */ new Set();
 function checkURL(request, init) {
   const url2 = request instanceof URL ? request : new URL(
@@ -14083,6 +14083,22 @@ var ChannelEventSchema = zod_default.union([
     })
   })
 ]);
+var ThreadEventSchema = zod_default.union([
+  zod_default.object({
+    type: zod_default.literal("thread:reply:created"),
+    payload: zod_default.object({
+      reply: RealtimeMessageSchema
+    })
+  }),
+  zod_default.object({
+    type: zod_default.literal("thread:reply:updated"),
+    payload: zod_default.object({
+      messageId: zod_default.string(),
+      reactions: zod_default.array(GroupReactionSchema),
+      threadId: zod_default.string()
+    })
+  })
+]);
 
 // node_modules/partyserver/dist/index.js
 import { DurableObject, env } from "cloudflare:workers";
@@ -14711,6 +14727,12 @@ var Chat = class extends Server {
         this.broadcast(payload, [connection.id]);
         return;
       }
+      const threadEvent = ThreadEventSchema.safeParse(parsed);
+      if (threadEvent.success) {
+        const payload = JSON.stringify(threadEvent.data);
+        this.broadcast(payload, [connection.id]);
+        return;
+      }
     } catch {
       console.error("Failed to parse message:", message);
     }
@@ -14796,7 +14818,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env2, _ctx, middlewareCtx
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// .wrangler/tmp/bundle-bYau65/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-Oif9tQ/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -14828,7 +14850,7 @@ function __facade_invoke__(request, env2, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// .wrangler/tmp/bundle-bYau65/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-Oif9tQ/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class ___Facade_ScheduledController__ {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

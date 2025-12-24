@@ -27,7 +27,7 @@ export function ChannelRealtimeProvider({children, channelId}: ChannelRealtimePr
                 const result = ChannelEventSchema.safeParse(evt);
 
                 if(!result.success){
-                    console.error("Invalid channel event received");
+                    console.log("Invalid channel event received");
                     return;
                 }
 

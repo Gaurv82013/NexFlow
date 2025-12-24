@@ -1,7 +1,6 @@
 
 import z from "zod";
 import { GroupReactionSchema } from "./message";
-import { channel } from "diagnostics_channel";
 
 export const UserSchema= z.object({
     id: z.string(),
@@ -83,3 +82,25 @@ export const ChannelEventSchema=z.union([
 ]);
 
 export type ChannelEvent= z.infer<typeof ChannelEventSchema>;
+
+//Thread level event
+
+export const ThreadEventSchema=z.union([
+    z.object({
+        type: z.literal("thread:reply:created"),
+        payload: z.object({
+            reply: RealtimeMessageSchema,
+        }),
+    }),
+    z.object({
+        type: z.literal("thread:reply:updated"),
+        payload: z.object({
+            messageId: z.string(),
+            reactions: z.array(GroupReactionSchema),
+            threadId : z.string(),
+        }),
+    }),
+    
+]);
+
+export type ThreadEvent= z.infer<typeof ThreadEventSchema>;
