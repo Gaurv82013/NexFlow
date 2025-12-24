@@ -4,18 +4,41 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { orpc } from "@/lib/orpc";
 import { useQuery } from "@tanstack/react-query";
 import { SearchIcon, Users } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MemberItem } from "./MemberItem";
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePresence } from "@/hooks/use-presence";
+import { useParams } from "next/navigation";
+import { User } from "@/app/schemas/realtime";
 
 export function MembersOverview() {
+    const params=useParams();
+    const workspaceId = params.workspaceId;
+    
     const [open, setOpen]=useState(false);
     const [search, setSearch]=useState("");
     const {data, isLoading, error}=useQuery(orpc.workspace.member.list.queryOptions());
 
-    if(error){
-        return <div className="text-red-500">Failed to load members.</div>
-    }
+    const {data:workspaceData}=useQuery(orpc.workspace.list.queryOptions());
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
+    const currentUser=useMemo(()=>{
+            if(!workspaceData?.User){
+                return null;
+            }
+            return {
+                id: workspaceData.User.id,
+                full_name: workspaceData.User.given_name ?? undefined,
+                email: workspaceData.User.email,
+                picture: workspaceData.User.picture,
+            } satisfies User;
+    
+        },[workspaceData?.User]);
+
+    const {onlineUsers} = usePresence({
+            room:`workspace-${workspaceId}`,
+            currentUser:currentUser,
+    });
+    
     const members=data ?? [];
     const query =search.trim().toLowerCase();
     const filteredMembers=query ? members.filter((member)=>{
@@ -23,6 +46,12 @@ export function MembersOverview() {
         const email= member.email?.toLowerCase()
         return name?.includes(query) || email?.includes(query);
     }): members;
+
+    const onlineUserIds = useMemo(() => new Set(onlineUsers.map((user) => user.id)), [onlineUsers]);
+    
+    if(error){
+        return <div className="text-red-500">Failed to load members.</div>
+    }
     return(
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -59,7 +88,7 @@ export function MembersOverview() {
                             <p className="text-sm text-muted-foreground px-3">No members found.</p>
                         ) : (
                             filteredMembers.map((member) => (
-                                <MemberItem key={member.id} member={member} />
+                                <MemberItem key={member.id} member={member} isOnline={member.id ? onlineUserIds.has(member.id) : false} />
                             ))
                         )}
                     </div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Message } from "@/lib/generated/prisma/client"
 import { orpc } from "@/lib/orpc"
+import { useChannelRealtime } from "@/providers/ChannelRealtimeProvider"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient, InfiniteData } from '@tanstack/react-query';
 import { useForm } from "react-hook-form"
@@ -16,6 +17,7 @@ interface EditMessageProps{
 }
 export function EditMessage({message, onCancel, onSave}: EditMessageProps){
     const QueryClient=useQueryClient();
+    const {send}=useChannelRealtime();
     const form=useForm({
         defaultValues:{
             content: message.content,
@@ -44,6 +46,12 @@ export function EditMessage({message, onCancel, onSave}: EditMessageProps){
                 }
             )
             toast.success("Message updated successfully");
+            send({
+                type:"message:updated",
+                payload:{
+                    message:updated.message,
+                }
+            });
             onSave();
             
         },

@@ -41,9 +41,10 @@ export const inviteMember=base
                     ]
                 }
             })
-        }catch{
+        }catch(err){
+            console.error("inviteMember error:", err);
             throw errors.INTERNAL_SERVER_ERROR();
-            
+
         }
     })
        
