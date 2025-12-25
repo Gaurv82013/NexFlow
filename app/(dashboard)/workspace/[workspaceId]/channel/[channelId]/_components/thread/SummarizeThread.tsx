@@ -68,8 +68,8 @@ export function SummarizeThread({messageId}:SummarizeThreadProps) {
     return(
         <Popover open={open} onOpenChange={handleOpenChanege}>
             <PopoverTrigger asChild>
-                <Button size="sm" type="button" className="border border-blue-500 bg-black-500">
-                    <span className="flex items-center gap-1.5 py-1">
+                <Button size="sm" type="button" className="border border-blue-500 bg-white dark:bg-[#262626] dark:hover:bg-blue-900/30 hover:bg-blue-100/50">
+                    <span className="flex items-center gap-1.5 py-1 text-black dark:text-white">
                         <Sparkles className="size-4" />
                         <span className="text-xs font-medium">Summarize</span>
                     </span>
