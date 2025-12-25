@@ -44,7 +44,7 @@ export function MenuBar({editor}:MenuBarProps) {
     }
 
     return(
-        <div className="border border-input border-t-0 border-x-0 rounded-t-lg p-2 bg-card flex flex-wrap gap-1 items-center">
+        <div className="border border-input border-t-0 border-x-0 rounded-t-lg p-1 bg-card flex flex-wrap gap-1 items-center text-sm">
             <TooltipProvider>
                 <div className="flex flex-wrap gap-1">
 
@@ -54,7 +54,7 @@ export function MenuBar({editor}:MenuBarProps) {
                             <Toggle size="sm" pressed={editor.isActive("bold")} onPressedChange={() => editor.chain().focus().toggleBold().run()} 
                             className={cn(editorState?.isBold && "bg-accent" )}
                             >
-                                <Bold />
+                                <Bold className="h-4 w-4" />
                             </Toggle>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -68,7 +68,7 @@ export function MenuBar({editor}:MenuBarProps) {
                             <Toggle size="sm" pressed={editor.isActive("italic")} onPressedChange={() => editor.chain().focus().toggleItalic().run()} 
                             className={cn(editorState?.isItalic && "bg-accent" )}
                             >
-                                <Italic />
+                                <Italic className="h-4 w-4" />
                             </Toggle>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -83,7 +83,7 @@ export function MenuBar({editor}:MenuBarProps) {
                             <Toggle size="sm" pressed={editor.isActive("strike")} onPressedChange={() => editor.chain().focus().toggleStrike().run()} 
                             className={cn(editorState?.isStrike && "bg-accent" )}
                             >
-                                <Strikethrough />
+                                <Strikethrough className="h-4 w-4" />
                             </Toggle>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -98,7 +98,7 @@ export function MenuBar({editor}:MenuBarProps) {
                             <Toggle size="sm" pressed={editor.isActive("codeBlock")} onPressedChange={() => editor.chain().focus().toggleCodeBlock().run()} 
                             className={cn(editorState?.isCodeBlock && "bg-accent" )}
                             >
-                                <Code />
+                                <Code className="h-4 w-4" />
                             </Toggle>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -107,7 +107,7 @@ export function MenuBar({editor}:MenuBarProps) {
                     </Tooltip>
 
                     {/* separator */}
-                    <div className="w-px h-8 bg-border mx-2"></div>
+                    <div className="w-px h-6 bg-border mx-1"></div>
 
                     {/* for bulletList */}
 
@@ -116,7 +116,7 @@ export function MenuBar({editor}:MenuBarProps) {
                             <Toggle size="sm" pressed={editor.isActive("bulletList")} onPressedChange={() => editor.chain().focus().toggleBulletList().run()} 
                             className={cn(editorState?.isBulletList && "bg-accent" )}
                             >
-                                <ListIcon  />
+                                <ListIcon className="h-4 w-4" />
                             </Toggle>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -131,7 +131,7 @@ export function MenuBar({editor}:MenuBarProps) {
                             <Toggle size="sm" pressed={editor.isActive("orderedList")} onPressedChange={() => editor.chain().focus().toggleOrderedList().run()} 
                             className={cn(editorState?.isOrderedList && "bg-accent" )}
                             >
-                                <ListOrdered  />
+                                <ListOrdered className="h-4 w-4" />
                             </Toggle>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -140,14 +140,14 @@ export function MenuBar({editor}:MenuBarProps) {
                     </Tooltip>
 
                     {/* separator */}
-                    <div className="w-px h-8 bg-border mx-2"></div>
+                    <div className="w-px h-6 bg-border mx-1"></div>
 
                     {/* for Undo */}
 
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button size="sm" onClick={() => editor.chain().focus().undo().run()} type="button" variant="ghost" disabled={!editorState?.canUndo}>
-                                <Undo />
+                                <Undo className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -160,7 +160,7 @@ export function MenuBar({editor}:MenuBarProps) {
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button size="sm" onClick={() => editor.chain().focus().redo().run()} type="button" variant="ghost" disabled={!editorState?.canRedo}>
-                                <Redo />
+                                <Redo className="h-4 w-4" />
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -168,7 +168,7 @@ export function MenuBar({editor}:MenuBarProps) {
                         </TooltipContent>
                     </Tooltip>
                 </div>
-                <div className="w-px h-8 bg-border mx-2"></div>
+                <div className="w-px h-6 bg-border mx-1"></div>
                 <div className="flex-wrap flex gap-1">
                     <ComposeAssistent content={JSON.stringify(editorState?.currentContent)} onAccept={handleAcceptCompose} />
                 </div>

@@ -33,17 +33,17 @@ export function RichTextEditor({field, sendButton, footerLeft}:iAppProps) {
         editorProps: {
             attributes: {
                 class:
-                    "max-w-none min-h-[125px] p-4 focus:outline-none prose dark:prose-invert prose-sm sm:prose-base marker:text-primary",
+                    "max-w-none min-h-[55px] p-2 focus:outline-none prose dark:prose-invert prose-sm sm:prose-base marker:text-primary text-sm",
             },
         },
     })
     return (
         <div className="relative w-full border border-input rounded-lg overflow-hidden dark:bg-input/30 flex flex-col">
             <MenuBar editor={editor} />
-            <EditorContent editor={editor} className="max-h-[200px] overflow-y-auto"/>
-            <div className="flex items-center justify-between bg-card border-t border-input gap-2 py-2 px-3">
-                <div className="flex items-center min-h-8">{footerLeft}</div>
-                <div className="shink-0">{sendButton}</div>
+            <EditorContent editor={editor} className="max-h-[380px] overflow-y-auto"/>
+            <div className="flex items-center justify-between bg-card border-t border-input gap-2 py-1 px-2">
+                <div className="flex items-center min-h-6 text-sm">{footerLeft}</div>
+                <div className="shrink-0 h-8">{sendButton}</div>
             </div>
         </div>
     )

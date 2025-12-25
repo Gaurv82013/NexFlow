@@ -182,6 +182,8 @@
   content: attr(data-placeholder);
   float: left;
   height: 0;
+  font-size: 0.9rem;
+  line-height: 1.6rem;
   pointer-events: none;
 }
 
