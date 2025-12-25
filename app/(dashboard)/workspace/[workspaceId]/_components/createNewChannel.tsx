@@ -53,6 +53,7 @@ export function CreateNewChannel() {
         createChannelMutation.mutate(values);
     }
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const watchedName = form.watch("name");
     const transformedName = watchedName ? transformChannelName(watchedName) : "";
     return (

@@ -19,7 +19,7 @@ export function ThreadRealtimeProvider({children, threadId}: ThreadRealtimeProvi
     type ThreadListOptions= ReturnType<typeof orpc.message.thread.list.queryOptions>;
     type ThreadQueryData= Awaited<ReturnType<ThreadListOptions["queryFn"]>>;
     const socket = usePartySocket({
-        host:"http://127.0.0.1:8787",
+        host:"https://nexflow-realtime.gauravkumar803109.workers.dev",
         room:`thread-${threadId}`,
         party:"chat",
         onMessage(e){
