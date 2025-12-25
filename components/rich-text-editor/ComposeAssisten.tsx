@@ -2,6 +2,9 @@ import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import { Sparkles } from "lucide-react";
 import { Button } from "../ui/button";
 import { useEffect, useRef, useState } from "react";
+import MarkdownIt from "markdown-it";
+import DOMPurify from "dompurify";
+import parse from "html-react-parser";
 import { PopoverContent } from "../ui/popover";
 import { useChat } from "@ai-sdk/react";
 import { eventIteratorToStream } from "@orpc/server";
@@ -46,6 +49,58 @@ export function ComposeAssistent({ content, onAccept }: ComposeAssistentProps){
     const lastAssistent=messages.findLast((m)=>m.role==="assistant");
     const composedText=lastAssistent?.parts.filter((part)=>part.type==="text").map((part)=>part.text).join("\n\n") ?? "";
 
+    const md = new MarkdownIt({ html: false, linkify: true, breaks: true });
+
+    function convertPlainBulletsToMarkdown(text: string) {
+        const lines = text.split(/\r?\n/);
+        const out: string[] = [];
+        let inList = false;
+
+        const bulletRegex = /^([\u2022\u00B7•\-\*])\s*(.*)$/;
+        const numberedRegex = /^(\d+)\.\s+(.*)$/;
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const trimmed = line.trim();
+
+            if (trimmed === "") {
+                out.push("");
+                inList = false;
+                continue;
+            }
+
+            const b = trimmed.match(bulletRegex);
+            const n = trimmed.match(numberedRegex);
+
+            if (b) {
+                if (!inList) {
+                    if (out.length && out[out.length - 1].trim() !== "") out.push("");
+                    inList = true;
+                }
+                out.push(`- ${b[2]}`);
+                continue;
+            }
+
+            if (n) {
+                if (!inList) {
+                    if (out.length && out[out.length - 1].trim() !== "") out.push("");
+                    inList = true;
+                }
+                out.push(`${n[1]}. ${n[2]}`);
+                continue;
+            }
+
+            out.push(line);
+            inList = false;
+        }
+
+        return out.join("\n");
+    }
+
+    const normalizedComposed = composedText ? convertPlainBulletsToMarkdown(composedText) : "";
+    const composedHtml = normalizedComposed ? md.render(normalizedComposed) : "";
+    const composedSafeHtml = composedHtml ? DOMPurify.sanitize(composedHtml, { USE_PROFILES: { html: true } }) : "";
+
     function handleOpenChanege(nextOpen:boolean){
         setOpen(nextOpen);
 
@@ -72,7 +127,7 @@ export function ComposeAssistent({ content, onAccept }: ComposeAssistentProps){
                     </span>
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[325px] p-0">
+            <PopoverContent className="w-[70vw] max-w-3xl p-0">
                 <div className="flex items-center justify-between px-4 py-3 border-b">
                     <div className="flex items-center gap-2">
                         <span className="flex items-center gap-1.5">
@@ -88,7 +143,7 @@ export function ComposeAssistent({ content, onAccept }: ComposeAssistentProps){
                         </Button>
                     )}
                 </div>
-                <div className="px-4 py-3 max-h-80 overflow-y-auto">
+                <div className="px-4 py-3 max-h-[30vh] overflow-y-auto">
                     {error ? (
                         <div>
                             <p className="text-sm text-red-600 mb-2">
@@ -99,7 +154,9 @@ export function ComposeAssistent({ content, onAccept }: ComposeAssistentProps){
                             </Button>
                         </div>
                     ):composedText ? (
-                        <p>{composedText}</p>
+                        <div className="prose max-w-none text-sm dark:text-white light:text-black">
+                            {parse(composedSafeHtml)}
+                        </div>
                     ): status === "submitted" || status === "streaming" ? (
                         <div className="space-y-2">
                             <Skeleton className="h-4 w-3/4" />
@@ -123,8 +180,8 @@ export function ComposeAssistent({ content, onAccept }: ComposeAssistentProps){
                         Decline
                     </Button>
                     <Button type="submit" size="sm" disabled={!composedText} onClick={()=>{
-                        if(!composedText) return;
-                        onAccept?.(composedText);
+                        if(!normalizedComposed) return;
+                        onAccept?.(normalizedComposed);
                         stop();
                         clearError();
                         setMessages([]);
