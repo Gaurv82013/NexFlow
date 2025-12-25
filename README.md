@@ -6,6 +6,14 @@ Modern full‑stack app with AI for real‑time collaboration, messaging, and pr
 
 ---
 
+## AI-Powered Features
+
+- AI-based message summarization for long conversations
+- AI compose to rewrite or improve messages
+- Helps users save time and communicate better
+
+---
+
 ## Tech Stack
 
 - **Language:** TypeScript
