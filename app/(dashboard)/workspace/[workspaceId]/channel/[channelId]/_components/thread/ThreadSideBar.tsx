@@ -113,7 +113,7 @@ export function ThreadSideBar({user}:ThreadSidebarProps) {
         <ThreadRealtimeProvider threadId={selectedThreadId!}>
             <div className="w-[25rem] border-l h-full flex flex-col">
             {/* header */}
-            <div className="px-4 border-b py-2 flex items-center justify-between">
+            <div className="flex w-full items-center justify-between border-b border-border h-14 px-4">
                 <div className="flex items-center gap-2">
                     <MessageSquare className="size-4"/>
                     <span>Thread</span>
