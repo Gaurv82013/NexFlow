@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prisma:push": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first prisma db push"
+    "prisma:push": "cross-env NODE_OPTIONS=--dns-result-order=ipv4first prisma db push",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@ai-sdk/react": "^2.0.117",
