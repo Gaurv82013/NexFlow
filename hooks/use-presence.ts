@@ -40,7 +40,7 @@ export function usePresence({room, currentUser}: usePresenceProps) {
             console.log("Disconnected from presence server");
         },
         onError(){
-            console.error("Presence socket error");
+            console.log("Presence socket error");
         }
     })
 

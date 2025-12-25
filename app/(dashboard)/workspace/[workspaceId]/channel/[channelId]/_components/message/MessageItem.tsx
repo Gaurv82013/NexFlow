@@ -8,7 +8,7 @@ import { MessageListItem } from "@/lib/types";
 import { MessagesSquare } from "lucide-react";
 import { useThread } from "@/providers/ThreadProvider";
 import { orpc } from "@/lib/orpc";
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { ReactionsBar } from "../reaction/ReactionsBar";
 
 

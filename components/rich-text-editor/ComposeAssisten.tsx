@@ -143,7 +143,7 @@ export function ComposeAssistent({ content, onAccept }: ComposeAssistentProps){
                         </Button>
                     )}
                 </div>
-                <div className="px-4 py-3 max-h-[30vh] overflow-y-auto">
+                <div className="px-4 py-3 max-h-[300px] overflow-y-auto">
                     {error ? (
                         <div>
                             <p className="text-sm text-red-600 mb-2">

@@ -153,7 +153,7 @@ export function MessageInputForm({channelId, user}:iAppProps){
                     render={({ field })=>(
                         <FormItem>
                             <FormControl>
-                                <MessageComposer key={editorKey} value={field.value} onChange={field.onChange} onSubmit={()=> onSubmit(form.getValues())} isSubmitting={createMessageMutation.isPending} upload={upload} />
+                                <MessageComposer key={editorKey} value={field.value} onChange={field.onChange} onSubmit={()=> onSubmit(form.getValues())} isSubmitting={createMessageMutation.isLoading} upload={upload} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
