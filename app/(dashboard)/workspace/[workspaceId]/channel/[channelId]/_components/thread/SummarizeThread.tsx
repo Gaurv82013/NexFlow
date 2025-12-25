@@ -6,7 +6,9 @@ import { eventIteratorToStream } from "@orpc/client";
 import { client } from "@/lib/orpc";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
-import { clear } from "console";
+import MarkdownIt from "markdown-it";
+import DOMPurify from "dompurify";
+import parse from "html-react-parser";
 
 interface SummarizeThreadProps{
     messageId:string;
@@ -44,6 +46,10 @@ export function SummarizeThread({messageId}:SummarizeThreadProps) {
 
     const lastAssistent=messages.findLast((m)=>m.role==="assistant");
     const summaryText=lastAssistent?.parts.filter((part)=>part.type==="text").map((part)=>part.text).join("\n\n") ?? "";
+
+    const md = new MarkdownIt({ html: false, linkify: true, breaks: false });
+    const summaryHtml = summaryText ? md.render(summaryText) : "";
+    const summarySafeHtml = summaryHtml ? DOMPurify.sanitize(summaryHtml, { USE_PROFILES: { html: true } }) : "";
 
     function handleOpenChanege(nextOpen:boolean){
         setOpen(nextOpen);
@@ -96,7 +102,9 @@ export function SummarizeThread({messageId}:SummarizeThreadProps) {
                             </Button>
                         </div>
                     ):summaryText ? (
-                        <p>{summaryText}</p>
+                        <div className="prose max-w-none text-sm dark:text-white light:text-black">
+                            {parse(summarySafeHtml)}
+                        </div>
                     ): status === "submitted" || status === "streaming" ? (
                         <div className="space-y-2">
                             <Skeleton className="h-4 w-3/4" />
