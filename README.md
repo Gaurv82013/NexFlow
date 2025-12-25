@@ -1,6 +1,6 @@
 # NexFlow
 
-Modern full‑stack app for real‑time collaboration, messaging, and productivity.
+Modern full‑stack app with AI for real‑time collaboration, messaging, and productivity.
 
 **Tagline:** Fast, secure, and scalable realtime collaboration for teams.
 
