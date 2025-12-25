@@ -127,7 +127,7 @@ export function ComposeAssistent({ content, onAccept }: ComposeAssistentProps){
                     </span>
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[325px] p-0">
+            <PopoverContent className="w-[70vw] max-w-3xl p-0">
                 <div className="flex items-center justify-between px-4 py-3 border-b">
                     <div className="flex items-center gap-2">
                         <span className="flex items-center gap-1.5">
@@ -143,7 +143,7 @@ export function ComposeAssistent({ content, onAccept }: ComposeAssistentProps){
                         </Button>
                     )}
                 </div>
-                <div className="px-4 py-3 max-h-80 overflow-y-auto">
+                <div className="px-4 py-3 max-h-[30vh] overflow-y-auto">
                     {error ? (
                         <div>
                             <p className="text-sm text-red-600 mb-2">
