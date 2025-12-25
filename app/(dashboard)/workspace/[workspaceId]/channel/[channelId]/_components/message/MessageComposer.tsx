@@ -18,7 +18,7 @@ export function MessageComposer({value, onChange, onSubmit, isSubmitting, upload
         <>
             <RichTextEditor field={{value, onChange}} 
             sendButton={
-            <Button className="hover:cursor-pointer" type="button" size="sm" onClick={onSubmit} disabled={isSubmitting}>
+            <Button className="hover:cursor-pointer" type="button" size="sm" onClick={onSubmit} disabled={isSubmitting || (( !value || value.trim() === "" ) && !upload.stagedUrl)}>
                 <Send className="size-4 mr-1"/>
                 Send
             </Button>}

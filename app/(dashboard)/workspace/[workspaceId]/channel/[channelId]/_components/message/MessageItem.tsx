@@ -31,6 +31,15 @@ export function MessageItem({message, currentUserId}: isAppProps) {
             .prefetchQuery({...options, staleTime:60_000})
             .catch((err)=>console.error("Error prefetching thread:", err));
     }, [message.id, queryClient]);
+    const safeParseContent = useCallback((raw?: string | null) => {
+        if (!raw) return null;
+        try {
+            return JSON.parse(raw);
+        } catch (e) {
+            console.warn("Failed to parse message.content as JSON:", e);
+            return null;
+        }
+    }, []);
     return(
         <div className="flex space-x-4 relative p-2 rounded-lg group hover:bg-muted/50">
             <Image src={getAvatar(message.authorAvatar, message.authorEmail)} alt={message.authorName} width={32} height={32} className="rounded-lg size-8"/>
@@ -55,7 +64,7 @@ export function MessageItem({message, currentUserId}: isAppProps) {
                     <EditMessage message={message} onCancel={() => setIsEditing(false)} onSave={() => setIsEditing(false)} />
                 ):(
                     <div>
-                        <SafeContent className="text-sm break-words prose dark:prose-invert max-w-none mark:text-primary" content={JSON.parse(message.content)} />
+                        <SafeContent className="text-sm break-words prose dark:prose-invert max-w-none mark:text-primary" content={safeParseContent(message.content)} />
                         {message.imageUrl && (
                             <div className="mt-3">
                                 <Image src={message.imageUrl} alt="Message Attachment" width={512} height={384} className="rounded-md object-cover max-h-60"/>
